@@ -71,3 +71,4 @@ widgets:
             align: bottom_right
             text: "Power"
             hidden: true # always hidden, until state is updated in switch_tile_state.yaml
+            clickable: false # Disable click capture; events bubble to button
