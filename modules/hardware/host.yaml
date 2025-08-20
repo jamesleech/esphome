@@ -1,0 +1,29 @@
+host:
+  mac_address: "06:35:69:ab:f6:79" # The only configuration required is to optionally set a dummy MAC address that will be used to identify the configuration to Home Assistant
+
+display:
+  - platform: sdl
+    show_test_card: true
+    dimensions:
+      width: 800
+      height: 480
+
+touchscreen:
+  platform: sdl
+
+# Dummy output for SDL
+output:
+  - platform: template
+    id: backlight_output
+    type: float # Specify the type as float
+    write_action:
+      - logger.log:
+          format: "Dummy backlight set to %.2f"
+          args: ["state"]
+
+# Dummy light component for SDL
+light:
+  - platform: binary
+    id: display_backlight
+    name: "SDL Display Backlight"
+    output: backlight_output

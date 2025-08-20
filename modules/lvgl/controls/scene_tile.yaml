@@ -1,0 +1,63 @@
+---
+# Button properties for a Light Toggle
+# vars:
+# uid:
+# text:
+# icon:
+# entity_id:
+id: scene_${uid}
+
+on_short_click:
+  - logger.log: "scene tile button ${uid} clicked, turning on scene ${entity_id}"
+  - homeassistant.action:
+      action: scene.turn_on
+      data:
+        entity_id: ${entity_id}
+  - lvgl.widget.update:
+      id: icon_${uid}
+      hidden: true
+  - lvgl.widget.update:
+      id: spinner_${uid}
+      hidden: false
+  - delay: 2000ms
+  - lvgl.widget.update:
+      id: icon_${uid}
+      hidden: false
+  - lvgl.widget.update:
+      id: spinner_${uid}
+      hidden: true
+
+on_long_press:
+  - logger.log: "scene tile button ${uid} long clicked, noop"
+
+widgets:
+  - obj:
+      layout:
+        type: flex
+        flex_flow: COLUMN
+      clickable: false # Disable click capture; events bubble to button
+      widgets:
+        - obj:
+            layout:
+              type: flex
+              flex_flow: ROW
+            height: 30%
+            clickable: false # Disable click capture; events bubble to button
+            widgets:
+              - label:
+                  id: icon_${uid}
+                  text_font: $icon_font
+                  align: top_left
+                  text: ${icon}
+                  clickable: false # Disable click capture; events bubble to button
+              - spinner:
+                  id: spinner_${uid}
+                  <<: !include
+                    file: ./icon_spinner.yaml
+              - label:
+                  id: label_${uid}
+                  text_font: ${text_font}
+                  align: bottom_left
+                  text: ${text}
+                  clickable: false # Disable click capture; events bubble to button
+

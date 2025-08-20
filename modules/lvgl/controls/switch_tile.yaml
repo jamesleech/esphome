@@ -1,0 +1,73 @@
+---
+# Button properties for a Light Toggle
+# vars:
+#   uid:
+#   text:
+#   icon:
+#   entity_id:
+#   visible: pointer to a global # TODO: the default hidden state, should it be visible when off, switches can be always shown, lights could be hidden when off
+
+id: button_${uid}
+hidden: !lambda |-
+  ESP_LOGD("switch_tile", "Setting hidden state for button_${uid} based on visible: ${visible}");
+  return ${visible}; // Dynamically set hidden based on visible
+
+# hidden: "false" # TODO: use !visible to set this dynamically, as a switch could be hidden or always shown
+on_short_click:
+  - logger.log: "switch tile button ${uid} clicked, toggling entity ${entity_id} via its stats button_switch_${uid}"
+  - lambda: |-
+      id(button_switch_${uid}).toggle();
+  - lvgl.widget.update:
+      id: icon_${uid}
+      hidden: true
+  - lvgl.widget.update:
+      id: spinner_${uid}
+      hidden: false
+
+on_long_press:
+  - logger.log: "switch tile button ${uid} long clicked"
+
+widgets:
+  - obj:
+      layout:
+        type: flex
+        flex_flow: COLUMN
+      clickable: false # Disable click capture; events bubble to button
+      widgets:
+        - obj:
+            layout:
+              type: flex
+              flex_flow: ROW
+            height: 30%
+            clickable: false # Disable click capture; events bubble to button
+            widgets:
+              - label:
+                  id: icon_${uid}
+                  text_font: $icon_font
+                  align: top_left
+                  text: ${icon}
+                  clickable: false # Disable click capture; events bubble to button
+              - spinner:
+                  id: spinner_${uid}
+                  <<: !include
+                    file: ./icon_spinner.yaml
+              - label:
+                  id: label_${uid}
+                  text_font: ${text_font}
+                  align: bottom_left
+                  text: ${text}
+                  clickable: false # Disable click capture; events bubble to button
+
+        - switch:
+            id: switch_tile_${uid}
+            align: BOTTOM_MID
+            width: 100%
+            height: 30%
+            clickable: false # Disable click capture; events bubble to button
+            bg_color: ${label_off_color}
+        - label:
+            id: power_label_${uid}
+            text_font: $text_font
+            align: bottom_right
+            text: "Power"
+            hidden: true # always hidden, until state is updated in switch_tile_state.yaml

@@ -1,0 +1,74 @@
+---
+# Button properties for a Light Toggle
+# vars:
+#   uid:
+
+id: ac_${uid}
+hidden: "false"
+on_short_click:
+  - logger.log: "ac tile ${uid} clicked"
+  # - homeassistant.action:
+  #     action: light.toggle
+  #     data:
+  #       entity_id: ${entity_id}
+  - lvgl.widget.update:
+      id: ac_icon_${uid}
+      hidden: true
+  - lvgl.widget.update:
+      id: spinner_${uid}
+      hidden: false
+  - delay: 2000ms
+  - lvgl.widget.update:
+      id: ac_icon_${uid}
+      hidden: false
+  - lvgl.widget.update:
+      id: spinner_${uid}
+      hidden: true
+
+on_long_press:
+  - logger.log: "ac tile ${uid} long clicked"
+
+widgets:
+  - obj:
+      layout:
+        type: flex
+        flex_flow: COLUMN
+      clickable: false
+      widgets:
+        - obj:
+            layout:
+              type: flex
+              flex_flow: ROW
+            height: 30%
+            clickable: false
+            widgets:
+              - label:
+                  id: ac_icon_${uid}
+                  text_font: $icon_font
+                  align: top_left
+                  text: $mdi_air_conditioner
+                  clickable: false
+              - spinner:
+                  id: spinner_${uid}
+                  <<: !include
+                    file: ./icon_spinner.yaml
+              - label:
+                  id: ac_label_mode_${uid}
+                  text_font: ${text_font}
+                  align: bottom_right
+                  text: "off"
+                  clickable: false
+
+        - label:
+            id: ac_label_temp_current_${uid}
+            text_font: ${text_font}
+            align: bottom_right
+            text: "--.- °C"
+            clickable: false
+
+        - label:
+            id: ac_label_temp_set_${uid}
+            text_font: ${text_font}
+            align: bottom_right
+            text: "--.- °C"
+            clickable: false

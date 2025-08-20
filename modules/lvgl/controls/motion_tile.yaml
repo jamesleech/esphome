@@ -1,0 +1,56 @@
+---
+# Button properties for a Light Toggle
+# vars:
+#   uid:
+#   icon:
+
+id: motion_${uid}
+hidden: "false"
+on_short_click:
+  - logger.log: "motion tile ${uid} clicked"
+  - lvgl.widget.update:
+      id: icon_${uid}
+      hidden: true
+  - lvgl.widget.update:
+      id: spinner_${uid}
+      hidden: false
+  - delay: 2000ms
+  - lvgl.widget.update:
+      id: icon_${uid}
+      hidden: false
+  - lvgl.widget.update:
+      id: spinner_${uid}
+      hidden: true
+
+on_long_press:
+  - logger.log: "motion tile ${uid} long clicked"
+
+widgets:
+  - obj:
+      layout:
+        type: flex
+        flex_flow: COLUMN
+      clickable: false
+      widgets:
+        - label:
+            id: icon_${uid}
+            text_font: $icon_font
+            align: top_left
+            text: ${icon}
+            clickable: false
+        - spinner:
+            id: spinner_${uid}
+            <<: !include
+              file: ./icon_spinner.yaml
+        - label:
+            id: label_temp_${uid}
+            text_font: ${text_font}
+            align: bottom_right
+            text: "--.- °C"
+            clickable: false
+        - label:
+            id: label_lux_${uid}
+            text_font: ${text_font}
+            align: bottom_right
+            text: "--.-f lx"
+            clickable: false

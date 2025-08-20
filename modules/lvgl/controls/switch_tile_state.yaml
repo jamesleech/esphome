@@ -1,0 +1,86 @@
+---
+# Basic switch or light state
+# vars:
+#   uid: <unique identifer for the switch. Must match the ID of the button>
+#   entity_id: <Home Assistant entity_id for the object we are controlling>
+#   has_power: bool # if true, the button will show a power consumption
+#   power_entity_id: <Home Assistant entity_id for the power state of the object>
+
+switch: # the switch tile is a button will toggle this switch, which in turn should toggle the home assistant entity
+  - id: button_switch_${uid}
+    platform: homeassistant
+    entity_id: ${entity_id}
+    internal: true
+
+sensor: # the sensor tile is a binary sensor that will update the state of the button and the icon
+  - id: sensor_power_${uid}
+    platform: homeassistant
+    entity_id: ${power_entity_id}
+    internal: true
+    on_value:
+      then:
+        - logger.log:
+            format: "sensor_power_${uid} value changed to %.1f W"
+            args: ["x"]
+        - if:
+            condition:
+              - binary_sensor.is_on: widget_sensor_${uid}
+            then:
+              - logger.log: "widget_sensor_${uid} is on updating and showing power label, has_power: ${has_power}"
+              - lvgl.label.update:
+                  id: power_label_${uid}
+                  text_color: $label_on_color
+                  hidden: !lambda |-
+                    return std::string("${has_power}") != std::string("True");
+                  text:
+                    format: "%.1f W"
+                    args: ["x"]
+            else:
+              - logger.log: "widget_sensor_${uid} is off hiding power label"
+              - lvgl.widget.update:
+                  id: power_label_${uid}
+                  hidden: true
+
+binary_sensor:
+  - id: widget_sensor_${uid}
+    platform: homeassistant
+    entity_id: ${entity_id}
+    trigger_on_initial_state: true
+    on_state:
+      - lvgl.widget.update:
+          id: icon_${uid}
+          hidden: false
+      - lvgl.widget.update:
+          id: spinner_${uid}
+          hidden: true
+      - if:
+          condition:
+            - binary_sensor.is_on: widget_sensor_${uid}
+          then:
+            - lvgl.widget.update:
+                id: button_${uid}
+                bg_color: $button_on_color
+            - lvgl.widget.update:
+                id: icon_${uid}
+                text_color: $icon_on_color
+            - lvgl.widget.update:
+                id: label_${uid}
+                text_color: $label_on_color
+            - lvgl.widget.update:
+                id: switch_tile_${uid}
+                state:
+                  checked: "true"
+          else:
+            - lvgl.widget.update:
+                id: button_${uid}
+                bg_color: $button_off_color
+            - lvgl.widget.update:
+                id: icon_${uid}
+                text_color: $icon_off_color
+            - lvgl.widget.update:
+                id: label_${uid}
+                text_color: $label_off_color
+            - lvgl.widget.update:
+                id: switch_tile_${uid}
+                state:
+                  checked: "false"

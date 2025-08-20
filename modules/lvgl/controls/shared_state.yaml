@@ -1,0 +1,53 @@
+---
+# Basic switch or light state
+# vars:
+#   uid: <unique identifer for the switch. Must match the ID of the button>
+#   entity_id: <Home Assistant entity_id for the object we are controlling>
+#   visible: global boolean toggle to hide the tile
+
+binary_sensor:
+  - id: widget_sensor_${uid}
+    platform: homeassistant
+    entity_id: ${entity_id}
+    trigger_on_initial_state: true
+    on_state:
+      - lvgl.widget.update:
+          id: icon_${uid}
+          hidden: false
+      - lvgl.widget.update:
+          id: spinner_${uid}
+          hidden: true
+      - if:
+          condition:
+            - binary_sensor.is_on: widget_sensor_${uid}
+          then:
+            - lvgl.widget.update:
+                id: button_${uid}
+                bg_color: $button_on_color
+            - lambda: |-
+                lv_obj_clear_flag(id(button_${uid}), LV_OBJ_FLAG_HIDDEN); // when the light is on, we want to always show the button
+                lv_obj_add_flag(id(button_${uid}), LV_OBJ_FLAG_USER_1);   // set the user flag to indicate the light is on
+            - lvgl.widget.update:
+                id: icon_${uid}
+                text_color: $icon_on_color
+            - lvgl.widget.update:
+                id: label_${uid}
+                text_color: $label_on_color
+          else:
+            # when the light is off we want to show the button if the visible state is true
+            - lambda: |-
+                lv_obj_clear_flag(id(button_${uid}), LV_OBJ_FLAG_USER_1);
+                if (id(${visible})) {
+                  lv_obj_clear_flag(id(button_${uid}), LV_OBJ_FLAG_HIDDEN);
+                } else {
+                  lv_obj_add_flag(id(button_${uid}), LV_OBJ_FLAG_HIDDEN);
+                }
+            - lvgl.widget.update:
+                id: button_${uid}
+                bg_color: $button_off_color
+            - lvgl.widget.update:
+                id: icon_${uid}
+                text_color: $icon_off_color
+            - lvgl.widget.update:
+                id: label_${uid}
+                text_color: $label_off_color

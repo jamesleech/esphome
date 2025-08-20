@@ -1,0 +1,44 @@
+esphome:
+  name: test
+  friendly_name: Test String Array
+  min_version: 2025.7.3
+  includes:
+    - includes/helpers.h
+
+logger:
+  level: DEBUG
+  
+host:
+  mac_address: "06:35:69:ab:f6:79" # The only configuration required is to optionally set a dummy MAC address that will be used to identify the configuration to Home Assistant
+
+display:
+  - platform: sdl
+    show_test_card: true
+    dimensions:
+      width: 800
+      height: 480
+
+touchscreen:
+  platform: sdl
+
+script:
+  - id: test_string_array
+    parameters:
+      items: string
+    then:
+      - lambda: |-
+          log_items(items);
+
+lvgl:
+  pages:
+    - widgets:
+        - button:
+            id: test_button
+            on_click:
+              - script.execute:
+                  id: test_string_array
+                  items: "item1,item2,item3"
+            widgets:
+              - label:
+                  align: CENTER
+                  text: Test

@@ -1,0 +1,20 @@
+ota:
+  id: esphome_ota
+  platform: esphome
+  password: !secret ota_password
+  on_begin:
+    then:
+      - logger.log: "Starting OTA update"
+      - logger.log: "Pausing LVGL and turning off backlight"
+      - light.turn_off: display_backlight
+      - lvgl.pause:
+      - logger.log: "OTA update started"
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "display5inch"
+    password: !secret wifi_password
+  domain: ".local"

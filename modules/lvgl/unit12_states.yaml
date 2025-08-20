@@ -1,0 +1,153 @@
+# todo, import hass button states that align with the lvgl
+# perhaps move to the unit12.yaml or have it import these
+
+# living
+button_ac_living_state: !include
+  file: ./controls/ac_tile_state.yaml
+  vars:
+    uid: living
+    temperature_current_entity_id: sensor.aircon_living_measured_value_of_room_temperature
+    climate_entity_id: climate.aircon_living
+button_living_entry_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: living_entry
+    entity_id: light.entry
+    visible: living_show_lights
+button_living_table_center_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: living_table_center
+    entity_id: light.table_center
+    visible: living_show_lights
+button_living_table_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: living_table
+    entity_id: light.hue_color_spot_4
+    visible: living_show_lights
+button_living_balcony_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: living_balcony
+    entity_id: light.hue_color_spot_4_2
+    visible: living_show_lights
+button_living_balcony_strip_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: living_balcony_strip
+    entity_id: light.balcony_strip
+    visible: living_show_lights
+button_living_couch_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: living_couch
+    entity_id: light.hue_play_1
+    visible: living_show_lights
+button_living_tv_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: living_tv
+    entity_id: light.hue_play_1_2
+    visible: living_show_lights
+
+# office
+
+button_office_lamp_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: office_lamp
+    entity_id: light.budgie_lamp
+    visible: office_show_lights
+button_office_desk_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: office_desk
+    entity_id: light.hue_color_spot_1
+    visible: office_show_lights
+button_office_cupboard_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: office_cupboard
+    entity_id: light.hue_color_spot_3
+    visible: office_show_lights
+button_office_entry_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: office_entry
+    entity_id: light.hue_ambiance_spot_2
+    visible: office_show_lights
+button_office_wall_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: office_wall
+    entity_id: light.hue_ambiance_spot_1
+    visible: office_show_lights
+button_office_monitor_left_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: office_monitor_left
+    entity_id: light.hue_play_2
+    visible: office_show_lights
+button_office_monitor_right_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: office_monitor_right
+    entity_id: light.hue_play_1_3
+    visible: office_show_lights
+button_office_computer_power_state: !include
+  file: ./controls/switch_tile_state.yaml
+  vars:
+    uid: office_computer_power
+    entity_id: light.hue_smart_plug_1
+    power_entity_id: sensor.office_heater_power # has_power is false for this, but we need an entity to pass in
+    visible: global_always_true # always show the computer power switch
+    has_power: false # this is a switch that doesn't have power, so we don't show the power label
+
+button_office_heater_power_state: !include
+  file: ./controls/switch_tile_state.yaml
+  vars:
+    uid: office_heater_power
+    entity_id: switch.office_heater_socket_1
+    power_entity_id: sensor.office_heater_power
+    visible: global_always_true # always show the heater power switch
+    has_power: true
+
+motion_office_state: !include
+  file: ./controls/motion_tile_state.yaml
+  vars:
+    uid: office_sensor
+    motion_entity_id: binary_sensor.budgie_motion_sensor_motion # todo template the naming
+    temperature_entity_id: sensor.budgie_motion_sensor_temperature # todo template the naming
+    light_level_entity_id: sensor.budgie_motion_sensor_light_level # todo template the naming
+
+#### kitchen
+motion_kitchen_state: !include
+  file: ./controls/motion_tile_state.yaml
+  vars:
+    uid: kitchen_sensor
+    motion_entity_id: binary_sensor.kitchen_motion_sensor_motion # todo template the naming
+    temperature_entity_id: sensor.kitchen_motion_sensor_temperature # todo template the naming
+    light_level_entity_id: sensor.kitchen_motion_sensor_light_level # todo template the naming
+
+button_kitchen_strip_state: !include
+  file: ./controls/switch_tile_state.yaml
+  vars:
+    uid: kitchen_strip
+    entity_id: light.kitchen_strip
+    visible: kitchen_show_lights
+    power_entity_id: sensor.office_heater_power # has_power is false for this, but we need an entity to pass in
+    has_power: false # this is a switch that doesn't have power, so we don't show the power label
+button_kitchen_fridge_state: !include
+  file: ./controls/light_tile_state.yaml
+  vars:
+    uid: kitchen_fridge
+    entity_id: light.fridge
+    visible: kitchen_show_lights
+#### bedroom
+
+# button_ac_bedroom_state: !include
+#   file: ./controls/ac_tile_state.yaml
+#   vars:
+#     uid: bedroom
+#     temperature_current_entity_id: sensor.aircon_bedroom_measured_value_of_room_temperature

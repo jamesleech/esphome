@@ -1,0 +1,36 @@
+esphome:
+  min_version: 2025.7.4
+  name: ${device_name}
+  friendly_name: ${device_name} display
+  on_boot:
+    priority: -100.0 # Run after LVGL initialization
+    then:
+      - delay: ${boot_screen_delay}
+      - lvgl.widget.hide: boot_screen # perhaps move to hide after api is connected. then no delay needed
+
+# Enable logging
+logger:
+  level: DEBUG
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret display_api_key
+  on_client_connected:
+    - if:
+        condition:
+          lambda: 'return (0 == client_info.find("Home Assistant "));'
+        then:
+          - lvgl.label.update:
+              id: lbl_ha_status
+              text: ${mdi_wifi}
+          - logger.log: "api connected"
+  on_client_disconnected:
+    - if:
+        condition:
+          lambda: 'return (0 == client_info.find("Home Assistant "));'
+        then:
+          - lvgl.label.update:
+              id: lbl_ha_status
+              text: ${mdi_wifi_off}
+          - logger.log: "api disconnected"

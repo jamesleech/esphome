@@ -1,0 +1,10 @@
+{
+  "name": "esphome",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "esphome run sdl.yaml"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

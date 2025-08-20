@@ -1,0 +1,65 @@
+---
+# common page template
+# vars:
+# page_title: the title of the page
+# page_id: the id of the page
+layout:
+  type: flex
+  flex_flow: ROW_WRAP
+width: 100%
+bg_color: black
+bg_opa: cover
+on_load:
+  - logger.log: "Loading page ${page_title}"
+  - lvgl.label.update:
+      id: lbl_page_title
+      text: ${page_title}
+  - if:
+      condition:
+        lambda: "return lv_scr_act() != id(settings_page)->obj;" # Runtime check: not on settings_page
+      then:
+        - lambda: "id(page_is_showing) = lv_scr_act();" # Store the current page object
+        - logger.log: "Setting globals page_is_showing ${page_title}"
+on_unload:
+  - logger.log: "Unloading page ${page_title}"
+
+# Swipe navigation
+# left and right swipes navigate between pages
+# down swipe shows settings page
+# up swipe returns to the last page before settings
+
+# on_swipe_right:
+#     - lambda: 'lv_indev_wait_release(lv_indev_get_act());'
+#     - logger.log: "Swipe right"
+#     - lvgl.page.next:
+#         # animation: OUT_RIGHT
+#         # time: 300ms
+# on_swipe_left:
+#     - lambda: 'lv_indev_wait_release(lv_indev_get_act());'
+#     - logger.log: "Swipe left"
+#     - lvgl.page.previous:
+#         # animation: OUT_LEFT
+#         # time: 300ms
+on_swipe_down:
+  - lambda: "lv_indev_wait_release(lv_indev_get_act());"
+  - logger.log: "Swipe down"
+  - if:
+      condition:
+        lambda: "return lv_scr_act() != id(settings_page)->obj;" # Runtime check: not on settings_page
+      then:
+        - logger.log: "settings_page is not showing, storing current page and showing settings"
+        - lambda: "id(page_is_showing) = lv_scr_act();" # Store the current page object
+        - lvgl.page.show:
+            id: settings_page
+      else:
+        - logger.log: "settings_page is already showing"
+on_swipe_up:
+  - lambda: "lv_indev_wait_release(lv_indev_get_act());"
+  - logger.log: "Swipe up"
+  - if:
+      condition:
+        lambda: "return lv_scr_act() == id(settings_page)->obj;" # Runtime check: on settings_page
+      then:
+        - logger.log: "settings_page is showing, going back to last page_is_showing"
+        - lambda: "lv_scr_load_anim(id(page_is_showing), LV_SCR_LOAD_ANIM_OUT_TOP, 0, 0, false);"
+        - logger.log: "Loaded previous page; current active is now non-settings" # Debug log post-load

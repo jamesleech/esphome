@@ -1,0 +1,66 @@
+esphome:
+  name: sonoffs26a
+  friendly_name: Printer Power Point
+  on_boot: # remove any existing password
+    - lambda: |-
+        id(esphome_ota).set_auth_password("");
+
+esp8266:
+  board: esp01_1m
+  board_flash_mode: dout
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret s26a_encryption "nzdKEYjpevv5lqXQvLiux+lik35lbuVDyBYrwGFntW4="
+
+ota:
+  id: esphome_ota
+  platform: esphome
+  # password:
+
+wifi:
+  ssid: !secret wifi_ssid_ext
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "s26awifi"
+    password: !secret wifi_password
+  domain: ".local"
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: false
+
+captive_portal:
+
+web_server:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "Sonoff S26_A Button"
+    on_press:
+      - switch.toggle: relay
+  - platform: status
+    name: "Sonoff S26_A Status"
+
+sensor:
+  - platform: wifi_signal
+    name: "Sonoff S26_A WiFi Signal"
+    update_interval: 60s
+switch:
+  - platform: gpio
+    name: "Sonoff S26_A Relay"
+    pin: GPIO12
+    id: "relay"
+  - platform: restart
+    name: "Sonoff S26_A Restart"

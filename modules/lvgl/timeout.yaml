@@ -1,0 +1,59 @@
+---
+number:
+  - platform: template
+    name: LVGL Screen timeout
+    optimistic: true
+    id: display_timeout
+    unit_of_measurement: "s"
+    initial_value: 45
+    restore_value: true
+    min_value: 10
+    max_value: 180
+    step: 5
+    mode: box
+
+lvgl:
+  on_pause:
+    then:
+      - logger.log:
+          format: "LVGL paused, last motion was at %d seconds ago"
+          args:
+            [id(homeassistant_time).now().timestamp - id(last_motion_seconds)]
+      # - light.turn_off: display_backlight
+      # Optional: Show a blank page
+      # - lvgl.page.show: id(blank_page)
+
+  on_resume:
+    - logger.log:
+        format: "LVGL resumed, last motion was at %d seconds ago"
+        args: [id(homeassistant_time).now().timestamp - id(last_motion_seconds)]
+
+  on_idle:
+    # timeout after display_timeout seconds of inactivity
+    # recheck if there was motion in the last 60 seconds.
+    # if so, reset the timeout to 1 second to recheck soon.
+    timeout: !lambda |-
+      if (id(last_motion_seconds) != 0 && (id(homeassistant_time).now().timestamp - id(last_motion_seconds)) <= 60) {
+        return 1000;  // Short timeout (1s) to recheck soon if motion within 60s
+      }
+      return id(display_timeout).state * 1000;  // Default timeout in milliseconds
+    then:
+      - logger.log:
+          format: "LVGL is idle. last motion: %d, now: %ld"
+          args:
+            [id(last_motion_seconds), id(homeassistant_time).now().timestamp]
+      - if:
+          condition:
+            lambda: |-
+              return id(last_motion_seconds) != 0 && (id(homeassistant_time).now().timestamp - id(last_motion_seconds)) <= 60;
+          then:
+            - logger.log:
+                format: "LVGL is idle but motion in last 60s, last motion was: %d seconds ago"
+                args:
+                  [
+                    id(homeassistant_time).now().timestamp - id(last_motion_seconds),
+                  ]
+          else:
+            - logger.log: "LVGL is idle and no motion, pausing LVGL"
+            - light.turn_off: display_backlight
+            - lvgl.pause:

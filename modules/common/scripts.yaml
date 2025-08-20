@@ -1,0 +1,48 @@
+esphome:
+  min_version: 2025.7.3
+  includes:
+    # - includes # import all from includes directory, seemed to work with sdl, but not esp32, importing each file works with esp32 tho...so
+    - includes/button_registry.h
+    - includes/scripts.h
+  on_boot:
+    priority: -100.0 # Run after LVGL initialization
+    then:
+      - lambda: |-
+          #include "button_registry.h"
+          // office
+          ButtonRegistry::register_button("button_office_lamp", id(button_office_lamp));
+          ButtonRegistry::register_button("button_office_desk", id(button_office_desk));
+          ButtonRegistry::register_button("button_office_cupboard", id(button_office_cupboard));
+          ButtonRegistry::register_button("button_office_entry", id(button_office_entry));
+          ButtonRegistry::register_button("button_office_wall", id(button_office_wall));
+          ButtonRegistry::register_button("button_office_monitor_left", id(button_office_monitor_left));
+          ButtonRegistry::register_button("button_office_monitor_right", id(button_office_monitor_right));
+          // living
+          ButtonRegistry::register_button("button_living_entry", id(button_living_entry));
+          ButtonRegistry::register_button("button_living_table_center", id(button_living_table_center));
+          ButtonRegistry::register_button("button_living_table", id(button_living_table));
+          ButtonRegistry::register_button("button_living_balcony", id(button_living_balcony));
+          ButtonRegistry::register_button("button_living_balcony_strip", id(button_living_balcony_strip));
+          ButtonRegistry::register_button("button_living_couch", id(button_living_couch));
+          ButtonRegistry::register_button("button_living_tv", id(button_living_tv));
+          // kitchen
+          ButtonRegistry::register_button("button_kitchen_strip", id(button_kitchen_strip));
+          ButtonRegistry::register_button("button_kitchen_fridge", id(button_kitchen_fridge));
+          // bedroom
+          // sauna
+          // bathroom
+          // hallway
+          // balcony
+
+script:
+  # todo: take the global and the button ids as parameters
+  - id: on_show_lights_change # Script to handle changes in office_show_lights
+    parameters:
+      show_lights: bool
+      button_ids: string
+    then:
+      - logger.log:
+          format: "on_show_lights_change: show_lights new state: %d"
+          args: ["show_lights"]
+      - lambda: |-
+          light_visibility(show_lights, button_ids);

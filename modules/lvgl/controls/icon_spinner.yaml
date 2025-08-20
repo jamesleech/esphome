@@ -1,0 +1,12 @@
+---
+hidden: true # Hide spinner by default, show when loading
+align: top_right
+width: 24px # same as icon font
+height: 24px # same as icon font
+spin_time: 1s
+arc_length: 60deg
+arc_width: 4
+indicator:
+  arc_color: ${icon_on_color}
+  arc_width: 4
+clickable: false # Disable click capture; events bubble to button

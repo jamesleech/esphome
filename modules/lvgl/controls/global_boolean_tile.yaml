@@ -1,0 +1,81 @@
+---
+# Global Toggle properties for a Light Toggle
+# vars:
+# uid: <unique identifier for the tile.>
+# text_when_true: the text to display when the global boolean is true
+# text_when_false: the text to display when the global boolean is false
+# icon_when_true: the icon to display when the global boolean is true
+# icon_when_false: the icon to display when the global boolean is false
+# entity_id: the global boolean entity id to toggle
+# button_ids: a comma separated list of button ids to update when the global boolean is toggled
+id: global_boolean_${uid}
+
+on_short_click:
+  then:
+    - logger.log:
+        format: "global boolean toggle ${uid} toggling ${entity_id} current state: %d"
+        args: ["id(${entity_id})"]
+    # toggle the value of the global boolean
+    - globals.set:
+        id: ${entity_id}
+        value: !lambda "return !id(${entity_id});"
+    # run the script for when we toggle state
+    - script.execute:
+        id: on_show_lights_change
+        show_lights: !lambda "return id(${entity_id});" # pass in the updated value of the global boolean
+        button_ids: ${button_ids}
+    - lvgl.label.update: # toggle the text displayed on this tile
+        id: label_${uid}
+        text: !lambda |-
+          if (id(${entity_id})) {
+            return "${text_when_true}";
+          } else {
+            return "${text_when_false}";
+          }
+    - lvgl.label.update: # toggle the icon displayed on this tile
+        id: icon_${uid}
+        text: !lambda |-
+          if (id(${entity_id})) {
+            return "${icon_when_true}";
+          } else {
+            return "${icon_when_false}";
+          }
+    - logger.log:
+        format: "global boolean toggle ${uid} toggling ${entity_id} new state: %d"
+        args: ["id(${entity_id})"]
+
+on_long_press:
+  - logger.log: "global boolean toggle ${uid} long clicked, noop"
+
+widgets:
+  - obj:
+      layout:
+        type: flex
+        flex_flow: COLUMN
+      clickable: false # Disable click capture; events bubble to button
+      widgets:
+        - obj:
+            layout:
+              type: flex
+              flex_flow: ROW
+            height: 30%
+            clickable: false # Disable click capture; events bubble to button
+            widgets:
+              - label:
+                  id: icon_${uid}
+                  text_font: $icon_font
+                  align: top_left
+                  text: !lambda |-
+                    if (id(${entity_id})) {
+                      return "${icon_when_true}";
+                    } else {
+                      return "${icon_when_false}";
+                    }
+                  clickable: false # Disable click capture; events bubble to button
+              - label:
+                  id: label_${uid}
+                  text_font: ${text_font}
+                  align: bottom_left
+                  text: ${text_when_false}
+                  clickable: false # Disable click capture; events bubble to button
+

@@ -1,0 +1,20 @@
+---
+# light tile state
+# vars:
+#   uid: <unique identifer for the switch. Must match the ID of the button>
+#   entity_id: <Home Assistant entity_id for the object we are controlling>
+#   visible: global boolean toggle to hide the tile
+sensor:
+  - id: brightness_${uid}
+    platform: homeassistant
+    entity_id: ${entity_id}
+    attribute: brightness
+    on_value:
+      - logger.log:
+          format: "Brightness for '${uid}' - '${entity_id}' changed to: %d"
+          args: ["int(x)"]
+      - lvgl.slider.update:
+          id: slider_${uid}
+          value: !lambda return x;
+
+<<: !include shared_state.yaml

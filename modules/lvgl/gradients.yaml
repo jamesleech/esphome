@@ -1,0 +1,11 @@
+---
+- id: header_footer_gradient
+  direction: ver
+  dither: none
+  stops:
+    - color: darkorange
+      position: 0
+    - color: orangered
+      position: 127
+    - color: darkorange
+      position: 255

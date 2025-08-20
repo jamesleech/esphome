@@ -1,0 +1,96 @@
+---
+# Hue Motion Sensor Tile
+# vars:
+#   uid: <unique identifer for the switch. Must match the ID of the button>
+#   motion_entity_id: <Home Assistant entity_id for the object we are controlling>
+#   temperature_entity_id: <Home Assistant entity_id for the temperature sensor>
+
+sensor:
+  - id: temperature_${uid}
+    platform: homeassistant
+    entity_id: ${temperature_entity_id}
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: label_temp_${uid}
+            text:
+              format: "%.1f °C"
+              args: ["x"]
+  - id: light_level_${uid}
+    platform: homeassistant
+    entity_id: ${light_level_entity_id}
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: label_lux_${uid}
+            text:
+              format: "%.0f lx"
+              args: ["x"]
+
+binary_sensor:
+  - id: motion_sensor_${uid}
+    platform: homeassistant
+    entity_id: ${motion_entity_id}
+    trigger_on_initial_state: true
+    on_state: # motion sensor state change
+      # wake the display if there is motion detected.
+      # todo, motion anywhere will wake all the display's everywhere....
+      # record the last motion time across all motion sensors in last_motion_seconds.
+      - if:
+          condition:
+            - binary_sensor.is_on: motion_sensor_${uid}
+          then:
+            - logger.log: "Motion detected by ${motion_entity_id}"
+            - logger.log:
+                format: "Updating last_motion_seconds: last motion: %d, now: %ld"
+                args:
+                  [
+                    id(last_motion_seconds),
+                    id(homeassistant_time).now().timestamp,
+                  ]
+            - lambda: |-
+                id(last_motion_seconds) = id(homeassistant_time).now().timestamp;
+            - logger.log:
+                format: "Updated last_motion_seconds: last motion: %d"
+                args: [id(last_motion_seconds)]
+            - if:
+                condition: lvgl.is_paused
+                then:
+                  - logger.log: "LVGL resuming"
+                  - lvgl.resume:
+                  - lvgl.widget.redraw:
+                  - light.turn_on: display_backlight
+            - lvgl.widget.update:
+                id: icon_${uid}
+                text_color: $icon_on_color
+            - lvgl.label.update: # show the header motion status icon once motion starts
+                id: lbl_motion_status
+                text: ${mdi_motion_sensor}
+                hidden: "false"
+            - lvgl.widget.update:
+                id: motion_${uid}
+                bg_color: $button_on_color
+            - lvgl.widget.update:
+                id: label_temp_${uid}
+                text_color: $label_on_color
+            - lvgl.widget.update:
+                id: label_lux_${uid}
+                text_color: $label_on_color
+          else:
+            - logger.log: "Motion stopped by ${motion_entity_id}"
+            - lvgl.widget.update:
+                id: icon_${uid}
+                text_color: $icon_off_color
+            - lvgl.label.update: # hide the header motion status icon once motion finishes
+                id: lbl_motion_status
+                text: ${mdi_motion_sensor_off}
+                hidden: "true"
+            - lvgl.widget.update:
+                id: motion_${uid}
+                bg_color: $button_off_color
+            - lvgl.widget.update:
+                id: label_temp_${uid}
+                text_color: $label_off_color
+            - lvgl.widget.update:
+                id: label_lux_${uid}
+                text_color: $label_off_color

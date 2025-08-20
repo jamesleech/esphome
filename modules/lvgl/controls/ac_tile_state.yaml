@@ -1,0 +1,91 @@
+---
+# Climate Tile State
+# vars:
+#   uid: <unique identifer for the switch. Must match the ID of the button>
+#   climate_entity_id: <Home Assistant entity_id for the climate device>
+#   temperature_current_entity_id: <Home Assistant entity_id for the temperature sensor>
+
+text_sensor:
+  - id: ac_temperature_mode_${uid}
+    platform: homeassistant
+    entity_id: ${climate_entity_id}
+    on_value:
+      then:
+        - logger.log:
+            format: "Current mode for ${climate_entity_id} is %s"
+            args: ["x.c_str()"]
+        - lvgl.label.update:
+            id: ac_label_mode_${uid}
+            text: !lambda |-
+              std::string mode = x;
+              if (mode == "off") return "Off";
+              if (mode == "fan_only") return "Fan";
+              if (mode == "heat") return "Heat";
+              if (mode == "heat_cool") return "Auto";
+              if (mode == "cool") return "Cool";
+              if (mode == "dry") return "Dry";
+              return "Unknown";
+        - if:
+            condition:
+              text_sensor.state:
+                id: ac_temperature_mode_${uid}
+                state: "off"
+            then:
+              - lvgl.widget.update:
+                  id: ac_${uid}
+                  bg_color: $button_off_color
+              - lvgl.widget.update:
+                  id: ac_icon_${uid}
+                  text_color: $icon_off_color
+              - lvgl.widget.update:
+                  id: ac_label_mode_${uid}
+                  text_color: $label_off_color
+              - lvgl.widget.update:
+                  id: ac_label_temp_current_${uid}
+                  text_color: $label_off_color
+              - lvgl.widget.update:
+                  id: ac_label_temp_set_${uid}
+                  text_color: $label_off_color
+            else:
+              - lvgl.widget.update:
+                  id: ac_${uid}
+                  bg_color: $button_on_color
+              - lvgl.widget.update:
+                  id: ac_icon_${uid}
+                  text_color: $icon_on_color
+              - lvgl.widget.update:
+                  id: ac_label_mode_${uid}
+                  text_color: $label_on_color
+              - lvgl.widget.update:
+                  id: ac_label_temp_current_${uid}
+                  text_color: $label_on_color
+              - lvgl.widget.update:
+                  id: ac_label_temp_set_${uid}
+                  text_color: $label_on_color
+
+sensor:
+  - id: ac_temperature_current_${uid}
+    platform: homeassistant
+    entity_id: ${temperature_current_entity_id}
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: ac_label_temp_current_${uid}
+            text:
+              format: "%.1f °C"
+              args: ["x"]
+
+  - id: ac_setpoint_${uid}
+    platform: homeassistant
+    entity_id: ${climate_entity_id}
+    attribute: temperature
+    on_value:
+      then:
+        - logger.log:
+            format: "Set point temperature for ${climate_entity_id} is %.1f °C"
+            args: ["x"]
+        - lvgl.label.update:
+            id: ac_label_temp_set_${uid}
+            text:
+              format: "%.1f °C"
+              args: ["x"]

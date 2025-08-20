@@ -1,0 +1,589 @@
+# lvgl unit12 configuration file
+.bases:
+  - &page_base
+    x: 0
+    y: 0
+    pad_top: ${page_y_offset}
+    pad_left: 8
+    pad_right: 4
+    width: 100%
+    height: ${page_height} # height minus header and footer
+    layout:
+      type: flex
+      flex_flow: ROW_WRAP
+
+lvgl:
+  color_depth: 16
+  bg_color: 0
+  border_width: 0
+  outline_width: 0
+  shadow_width: 0
+  shadow_opa: TRANSP
+  align: center
+  page_wrap: true
+  gradients: !include ./gradients.yaml
+  style_definitions: # Keep for custom/non-global styles
+    - id: header
+      height: 20
+      bg_grad: header_footer_gradient
+      bg_grad_dir: VER
+      bg_opa: COVER
+      border_opa: TRANSP
+      radius: 0
+      pad_all: 0
+      pad_row: 0
+      pad_column: 0
+      border_color: purple
+      text_color: white
+      text_font: roboto24
+    - id: footer
+      width: 100%
+      height: 30
+      bg_grad: header_footer_gradient
+      border_color: purple
+      text_font: $icon_font
+      text_color: white
+      bg_grad_dir: VER
+      bg_opa: COVER
+      border_opa: TRANSP
+      shadow_opa: TRANSP
+      radius: 0
+      pad_all: 0
+      pad_row: 0
+      pad_column: 0
+    - id: icon_style
+      text_font: $icon_font
+      text_color: white
+      align: center
+      pad_left: 2
+      pad_right: 2
+  top_layer:
+    widgets:
+      - obj: # header
+          styles: header
+          x: 0
+          y: 0
+          height: ${header_height}
+          width: 100%
+          layout:
+            type: flex
+            flex_flow: ROW
+            flex_align_main: START
+            flex_align_cross: CENTER
+            flex_align_track: CENTER
+          align: TOP_MID
+          widgets:
+            - label:
+                id: lbl_page_title
+                align: CENTER
+                text: Home
+                pad_left: 4
+            - obj:
+                height: ${header_height}
+                flex_grow: 1
+                align: RIGHT_MID
+                scrollable: false
+                layout:
+                  type: flex
+                  flex_flow: ROW
+                  flex_align_main: END
+                widgets:
+                  - label:
+                      id: lbl_motion_status
+                      styles: icon_style
+                      align: CENTER
+                      pad_top: 4
+                      pad_right: 4
+                      text: ${mdi_motion_sensor_off} # once api connects / disconnects, icon will be updated
+                  - label:
+                      id: lbl_ha_status
+                      styles: icon_style
+                      align: CENTER
+                      pad_top: 4
+                      pad_right: 4
+                      text: ${mdi_wifi_refresh} # once api connects / disconnects, icon will be updated
+                  - label:
+                      id: lbl_page_time
+                      align: CENTER
+                      text: "--:--"
+                      pad_top: 2
+                      pad_right: 4
+      - buttonmatrix: #footer
+          id: top_layer_footer
+          align: bottom_mid
+          width: 100%
+          styles: footer
+          pad_all: 0
+          outline_width: 0
+          items:
+            styles: footer
+            bg_opa: TRANSP
+          rows:
+            - buttons:
+                - id: button_page_prev
+                  text: ${mdi_arrow_left}
+                  on_press:
+                    then:
+                      lvgl.page.previous:
+                - id: button_page_living
+                  text: ${mdi_home}
+                  on_press:
+                    then:
+                      lvgl.page.show: living_page
+                - id: button_page_office
+                  text: ${mdi_bird}
+                  on_press:
+                    then:
+                      lvgl.page.show: office_page
+                - id: button_page_kitchen
+                  text: ${mdi_silverware_fork_knife}
+                  on_press:
+                    then:
+                      lvgl.page.show: kitchen_page
+                - id: page_next
+                  text: ${mdi_arrow_right}
+                  on_press:
+                    then:
+                      lvgl.page.next:
+      - obj: # boot screen
+          id: boot_screen
+          width: 100%
+          height: 100%
+          bg_color: white
+          bg_opa: COVER
+          radius: 0
+          pad_all: 0
+          border_width: 0
+          widgets:
+            - spinner:
+                align: CENTER
+                y: 95
+                height: 50
+                width: 50
+                spin_time: 1s
+                arc_length: 60deg
+                arc_width: 8
+                indicator:
+                  arc_color: blue
+                  arc_width: 8
+          on_press:
+            - lvgl.widget.hide: boot_screen
+  pages:
+    #######
+    # Office Page
+    # This page contains controls for the office lights and scenes.
+    - id: office_page
+      <<: !include
+        file: ../common/page.yaml
+        vars:
+          page_title: Office
+          page_id: office_page
+      widgets:
+        - obj:
+            <<: *page_base
+            widgets:
+              - button: !include
+                  file: ./controls/motion_tile.yaml
+                  vars:
+                    uid: office_sensor
+                    motion_entity_id: binary_sensor.budgie_motion_sensor_motion # todo template the naming
+                    temperature_entity_id: sensor.budgie_motion_sensor_temperature # todo template the naming
+                    light_level_entity_id: sensor.budgie_motion_sensor_light_level # todo template the naming
+                    text: Motion
+                    icon: ${mdi_motion_sensor}
+              - button: !include
+                  file: ./controls/scene_tile.yaml
+                  vars:
+                    uid: office_work
+                    entity_id: scene.office_work
+                    text: Bright
+                    icon: ${mdi_lightbulb_group}
+                    isRGB: false
+              - button: !include
+                  file: ./controls/scene_tile.yaml
+                  vars:
+                    uid: office_dimmed
+                    entity_id: scene.office_dimmed
+                    text: Dimmed
+                    icon: ${mdi_lightbulb_group}
+                    isRGB: false
+              - button: !include
+                  file: ./controls/scene_tile.yaml
+                  vars:
+                    uid: office_nightlight
+                    entity_id: scene.office_nightlight
+                    text: Night
+                    icon: ${mdi_lightbulb_group_outline}
+                    isRGB: false
+              - button: !include
+                  file: ./controls/switch_tile.yaml
+                  vars:
+                    uid: office_computer_power
+                    entity_id: light.hue_smart_plug_1
+                    text: Computer
+                    icon: ${mdi_light_switch}
+                    visible: global_always_true # always show the computer power switch
+              - button: !include
+                  file: ./controls/switch_tile.yaml
+                  vars:
+                    uid: office_heater_power
+                    entity_id: switch.office_heater_socket_1
+                    text: Heater
+                    icon: ${mdi_light_switch}
+                    visible: global_always_true # always show the heater power switch
+              - button: !include
+                  file: ./controls/global_boolean_tile.yaml
+                  vars:
+                    uid: office_show_lights
+                    text_when_true: Hide
+                    text_when_false: Show
+                    icon_when_true: ${mdi_eye_off}
+                    icon_when_false: ${mdi_eye}
+                    entity_id: office_show_lights
+                    button_ids: "button_office_lamp,button_office_lamp,button_office_desk,button_office_cupboard,button_office_entry,button_office_wall,button_office_monitor_left,button_office_monitor_right"
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: office_lamp
+                    entity_id: light.budgie_lamp
+                    text: Lamp
+                    icon: ${mdi_floor_lamp}
+                    isRGB: false
+                    visible: office_show_lights
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: office_desk
+                    entity_id: light.hue_color_spot_1
+                    text: Desk
+                    icon: ${mdi_track_light}
+                    isRGB: true
+                    visible: office_show_lights
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: office_cupboard
+                    entity_id: light.hue_color_spot_3
+                    text: Cupboard
+                    icon: ${mdi_track_light}
+                    isRGB: true
+                    visible: office_show_lights
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: office_entry
+                    entity_id: light.hue_ambiance_spot_2
+                    text: Entry
+                    icon: ${mdi_track_light}
+                    isRGB: false
+                    visible: office_show_lights
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: office_wall
+                    entity_id: light.hue_ambiance_spot_1
+                    text: Wall
+                    icon: ${mdi_track_light}
+                    isRGB: false
+                    visible: office_show_lights
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: office_monitor_left
+                    entity_id: light.hue_play_2
+                    text: Left
+                    icon: ${mdi_wall_sconce_flat_variant}
+                    isRGB: true
+                    visible: office_show_lights
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: office_monitor_right
+                    entity_id: light.hue_play_1_3
+                    text: Right
+                    icon: ${mdi_wall_sconce_flat_variant}
+                    isRGB: true
+                    visible: office_show_lights
+    #######
+    # Living Room
+    # This page contains controls for the living room lights.
+    - id: living_page
+      <<: !include
+        file: ../common/page.yaml
+        vars:
+          page_title: Living
+          page_id: living_page
+      widgets:
+        - obj:
+            <<: *page_base
+            widgets:
+              - button: !include
+                  file: ./controls/ac_tile.yaml
+                  vars:
+                    uid: living
+              - button: !include
+                  file: ./controls/scene_tile.yaml
+                  vars:
+                    uid: living_dinner_time
+                    entity_id: scene.living_dinner_time
+                    text: Dinner
+                    icon: ${mdi_lightbulb_group}
+              - button: !include
+                  file: ./controls/scene_tile.yaml
+                  vars:
+                    uid: living_couch_time
+                    entity_id: scene.living_couch_time
+                    text: Couch
+                    icon: ${mdi_lightbulb_group}
+              - button: !include
+                  file: ./controls/scene_tile.yaml
+                  vars:
+                    uid: living_projector
+                    entity_id: scene.living_projector
+                    text: TV
+                    icon: ${mdi_lightbulb_group}
+              - button: !include
+                  file: ./controls/scene_tile.yaml
+                  vars:
+                    uid: living_dimmed
+                    entity_id: scene.living_dimmed
+                    text: Dimmed
+                    icon: ${mdi_lightbulb_group}
+              - button: !include
+                  file: ./controls/global_boolean_tile.yaml
+                  vars:
+                    uid: living_show_lights
+                    text_when_true: Hide
+                    text_when_false: Show
+                    icon_when_true: ${mdi_eye_off}
+                    icon_when_false: ${mdi_eye}
+                    entity_id: living_show_lights
+                    button_ids: "button_living_entry,button_living_table_center,button_living_table,button_living_balcony,button_living_balcony_strip,button_living_couch,button_living_tv"
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: living_entry
+                    entity_id: light.entry
+                    text: Entry
+                    icon: ${mdi_track_light}
+                    isRGB: true
+                    visible: living_show_lights
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: living_table_center
+                    entity_id: light.table_center
+                    text: Center
+                    icon: ${mdi_track_light}
+                    isRGB: true
+                    visible: living_show_lights
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: living_table
+                    entity_id: light.hue_color_spot_4
+                    text: Table
+                    icon: ${mdi_track_light}
+                    isRGB: true
+                    visible: living_show_lights
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: living_balcony
+                    entity_id: light.hue_color_spot_4_2
+                    text: Balcony
+                    icon: ${mdi_track_light}
+                    isRGB: true
+                    visible: living_show_lights
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: living_balcony_strip
+                    entity_id: light.balcony_strip
+                    text: Strip
+                    icon: ${mdi_led_strip}
+                    isRGB: true
+                    visible: living_show_lights
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: living_couch
+                    entity_id: light.hue_play_1
+                    text: Couch
+                    icon: ${mdi_wall_sconce_flat_variant}
+                    isRGB: true
+                    visible: living_show_lights
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: living_tv
+                    entity_id: light.hue_play_1_2
+                    text: TV
+                    icon: ${mdi_wall_sconce_flat_variant}
+                    isRGB: true
+                    visible: living_show_lights
+
+    #######
+    # Kitchen Page
+    # This page contains controls for the kitchen.
+    - id: kitchen_page
+      <<: !include
+        file: ../common/page.yaml
+        vars:
+          page_title: Kitchen
+          page_id: kitchen_page
+      widgets:
+        - obj:
+            <<: *page_base
+            widgets:
+              - button: !include
+                  file: ./controls/motion_tile.yaml
+                  vars:
+                    uid: kitchen_sensor
+                    motion_entity_id: binary_sensor.kitchen_motion_sensor_motion # todo template the naming
+                    temperature_entity_id: sensor.kitchen_motion_sensor_temperature # todo template the naming
+                    light_level_entity_id: sensor.kitchen_motion_sensor_light_level # todo template the naming
+                    icon: ${mdi_motion_sensor}
+              - button: !include
+                  file: ./controls/global_boolean_tile.yaml
+                  vars:
+                    uid: kitchen_show_lights
+                    text_when_true: Hide
+                    text_when_false: Show
+                    icon_when_true: ${mdi_eye_off}
+                    icon_when_false: ${mdi_eye}
+                    entity_id: kitchen_show_lights
+                    button_ids: "button_kitchen_strip,button_kitchen_fridge"
+              - button: !include
+                  file: ./controls/switch_tile.yaml
+                  vars:
+                    uid: kitchen_strip
+                    entity_id: light.kitchen_strip
+                    text: Strip
+                    icon: ${mdi_led_strip}
+                    visible: kitchen_show_lights
+              - button: !include
+                  file: ./controls/light_tile.yaml
+                  vars:
+                    uid: kitchen_fridge
+                    entity_id: light.fridge
+                    text: Fridge
+                    icon: ${mdi_wall_sconce_flat_variant}
+                    isRGB: true
+                    visible: kitchen_show_lights
+
+    #######
+    # Settings Page
+    # This page contains settings for the display, such as brightness.
+    - id: settings_page
+      <<: !include
+        file: ../common/page.yaml
+        vars:
+          page_title: Settings
+          page_id: settings_page
+      skip: true
+      widgets:
+        - obj:
+            <<: *page_base
+            widgets:
+              - label:
+                  text: "Display Brightness"
+                  align: top_mid
+                  y: 20
+              - slider:
+                  id: brightness_slider
+                  min_value: 0
+                  max_value: 100
+                  value: 100
+                  width: 600
+                  height: 50
+                  align: center
+                  y: 100
+                  on_value:
+                    - light.turn_on:
+                        id: display_backlight
+                        brightness: !lambda "return x / 100.0;"
+
+    # This page contains settings for the light color and brightness.
+    # think of it as a light color 'modal' picker, which is shown when a light tile is long pressed.
+    # Before being shown, the long press action should set;
+    #
+    #   * page_return global, should be set so we have a return page.
+    #   * light_colour_entity_id global, should be set to the light to be controlled
+    #   * light_colour_name global, should be set to the name of the light, for display purposes.
+    #   * light_colour_isRGB global, should be set to true if the light is RGB, false otherwise.
+
+    - id: modal_light_colour_page
+      <<: !include
+        file: ../common/page.yaml
+        vars:
+          page_title: Light Settings
+          page_id: modal_light_colour_page
+      on_load:
+        - lvgl.label.update:
+            id: lbl_page_title
+            text: !lambda 'return "Light Settings - " + id(light_colour_entity_name);'
+      skip: true
+      widgets:
+        - obj:
+            <<: *page_base
+            widgets:
+              # brightness slider
+              - obj:
+                  height: 30
+                  width: 100%
+                  layout:
+                    type: flex
+                    flex_flow: ROW
+                  widgets:
+                    - label:
+                        width: 30%
+                        text: "Brightness"
+                        align: top_mid
+                    - slider:
+                        id: light_colour_slider_brightness
+                        width: 60%
+                        min_value: 0
+                        max_value: 256
+                        value: 100 # todo: setting should be read from the light entity
+                        height: 30
+                        align: center
+                        on_value:
+                          - homeassistant.action:
+                              action: light.turn_on
+                              data:
+                                entity_id: !lambda "return id(light_colour_entity_id);"
+                                brightness: !lambda "return int(x);"
+              # whiteness color picker, only shown if isRGB is false
+              # color picker, only shown if isRGB is
+              # red slider
+              - obj: !include
+                  file: ./controls/settings_rgb_slider.yaml
+                  vars:
+                    uid: red
+                    text: Red
+                    color: 0xFF0000
+              - obj: !include
+                  file: ./controls/settings_rgb_slider.yaml
+                  vars:
+                    uid: green
+                    text: Green
+                    color: 0x00FF00
+              - obj: !include
+                  file: ./controls/settings_rgb_slider.yaml
+                  vars:
+                    uid: blue
+                    text: Blue
+                    color: 0x0000FF
+              # done button
+              - button:
+                  height: 30
+                  id: light_colour_done_button
+                  # text: "Done"
+                  align: RIGHT_MID
+                  on_press:
+                    - lambda: "lv_scr_load_anim(id(page_return), LV_SCR_LOAD_ANIM_OUT_TOP, 0, 0, false);"
+                  widgets:
+                    - label:
+                        align: center
+                        text: "Done"

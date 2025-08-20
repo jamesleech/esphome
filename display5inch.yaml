@@ -1,0 +1,23 @@
+substitutions:
+  device_name: display5inch
+  is_sdl: "false" # Set to false if this is a real device, true if it is the sdl simulator
+
+  <<: !include
+    file: modules/common/mdi_glyph_substitutions.yaml
+  <<: !include
+    file: modules/common/substitutions.yaml
+
+packages:
+  globals: !include modules/common/globals.yaml
+  colors: !include modules/common/color.yaml
+  fonts: !include modules/common/fonts.yaml
+  theme_style: !include modules/common/theme_style.yaml
+  time: !include modules/common/time.yaml
+  timeout: !include modules/lvgl/timeout.yaml
+  core: !include modules/common/core.yaml
+  wifi: !include modules/common/wifi.yaml
+  hardware: !include modules/hardware/crowpanel-5inch-lvgl.yaml
+  scripts: !include modules/common/scripts.yaml
+  lvgl: !include modules/lvgl/unit12.yaml
+  <<: !include
+    file: modules/lvgl/unit12_states.yaml

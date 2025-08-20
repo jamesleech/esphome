@@ -1,0 +1,69 @@
+font:
+  - file: "gfonts://Roboto"
+    id: roboto24
+    size: 24
+    bpp: 8
+
+  # - file: "gfonts://Roboto"
+  #   id: roboto18
+  #   size: 18
+  #   bpp: 8
+
+  - file: "gfonts://Roboto"
+    id: roboto20
+    size: 20
+    bpp: 8
+
+  # http://materialdesignicons.com/cdn/7.4.47/
+  - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/v7.4.47/fonts/materialdesignicons-webfont.ttf"
+    id: light24
+    size: 24
+    bpp: 8
+    glyphs: [
+  
+        "\U000F0054", # mdi_arrow_right
+        "\U000F004D", # mdi_arrow_left
+
+        "\U000F02DC", # mdi_home
+        "\U000F15C6", # mdi_bird
+        "\U000F0A70", # mdi_silverware_fork_knife
+
+        "\U000F0335", # mdi-lightbulb
+        "\U000F0769", # mdi-ceiling-light
+        "\U000F06B5", # mdi-lamp
+        "\U000F08DD", # mdi-floor-lamp
+        "\U000F12BA", # mdi-string-lights
+        "\U000F0914", # mdi-track-light
+        "\U000F1A2F", # mdi-bulkhead_light:
+        "\U000F07D6", # mdi-led-strip
+        "\U000F1020", # mdi-coach-lamp
+        "\U000F1798", # mdi-ceiling-fan-light
+        "\U000F05A9", # mdi-wifi
+        "\U000F05AA", # mdi-wifi-off
+        "\U000F16C4", # mdi_wifi_refresh
+
+        "\U000F095F", # mdi_desk_lamp
+        "\U000F1B1F", # mdi_desk_lamp_off
+        "\U000F1B20", # mdi_desk_lamp_on
+
+        "\U000F097E", # mdi_light_switch
+        "\U000F1A24", # mdi_light_switch_off
+
+        "\U000F041C", # mdi_wall_sconce_flat_variant
+
+        "\U000F1253", # mdi_lightbulb_group
+        "\U000F1254", # mdi_lightbulb_group_outline
+
+        "\U000F0208", # mdi_eye
+        "\U000F0209", # mdi_eye_off
+
+        "\U000F0D91", # mdi_motion_sensor
+        "\U000F1435", # mdi_motion_sensor_off
+
+        "\U000F001B", # mdi_air_conditioner
+
+        "\U000F1472", # mdi_fan_speed_1
+        "\U000F1473", # mdi_fan_speed_2
+        "\U000F1474", # mdi_fan_speed_3
+
+      ]

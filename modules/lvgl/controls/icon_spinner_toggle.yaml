@@ -1,0 +1,16 @@
+# Show the spinner, hide the icon for the given uid
+# vars:
+#   uid: # Unique identifier for the widget
+- lvgl.widget.update:
+    id: icon_${uid}
+    hidden: true
+- lvgl.widget.update:
+    id: spinner_${uid}
+    hidden: false
+- delay: 1000ms
+- lvgl.widget.update:
+    id: icon_${uid}
+    hidden: false
+- lvgl.widget.update:
+    id: spinner_${uid}
+    hidden: true

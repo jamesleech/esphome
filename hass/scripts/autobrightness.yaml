@@ -1,0 +1,21 @@
+alias: Display Auto Brightness down
+description: "Set the LCD backlight based on the light level from the motion sensor in the same room as the display."
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.budgie_motion_sensor_light_level
+    attribute: light_level
+conditions:
+  - condition: template
+    value_template: "{{ is_number(states('sensor.budgie_motion_sensor_light_level')) }}"
+actions:
+  - action: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: >-
+        {{ max(40, min(100, states('sensor.budgie_motion_sensor_light_level') |
+        float(0) )) }}
+    target:
+      entity_id: light.display5inch_display5inch_display_backlight
+mode: queued
+max: 5

@@ -1,0 +1,40 @@
+# Boot screen configuration
+boot_screen_delay: 500ms
+
+# touchscreen
+touchscreen_idle_timeout: "60s"
+touchscreen_daytime_brightness: "100%"
+touchscreen_nighttime_brightness: "50%"
+
+# fonts
+icon_font: light24
+text_font: roboto20
+
+# colors
+icon_on_color: orangered
+icon_off_color: gray
+
+label_on_color: very_dark_gray
+label_off_color: gray
+
+text_color: white
+
+# display formats
+time_format: "%a %d %b %H:%M" # https://esphome.io/components/time/#strftime
+
+# tiles
+
+# page info
+header_height: 30 # Height of the header
+page_y_offset: 40 # Space for header
+page_height: 440 # height minus header and footer
+
+# buttons 800x480 5inch display...
+button_height_single: "128px" # 32% #"109px"
+button_height_double: "266px" # 64% #"228px"
+button_width: "150px"
+button_color: very_dark_gray
+button_text_color: white
+button_off_color: very_dark_gray
+button_on_color: white
+button_on_text_color: black

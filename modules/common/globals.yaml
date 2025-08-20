@@ -1,0 +1,62 @@
+globals:
+  - id: sdl_enabled
+    type: bool
+    restore_value: false
+    initial_value: ${is_sdl} # Set to 'true' for SDL builds
+
+  # keeps track of the current page that is shown
+  - id: page_is_showing
+    type: "lv_obj_t *"
+    restore_value: false
+    initial_value: "nullptr" # Use nullptr for safe initialization
+  # Global variable to store the current page that is should be returned to after a 'modal' has been shown.
+  - id: page_return
+    type: "lv_obj_t *"
+    restore_value: false
+    initial_value: "nullptr" # Use nullptr for safe initialization
+
+  # Global variable to store the timestamp as seconds since epoch
+  - id: last_motion_seconds
+    type: int
+    restore_value: false
+    initial_value: "0"
+
+  # Keep track if all light buttons are visible TODO: perhaps this could be a list of bools by page.
+  - id: office_show_lights
+    type: bool
+    restore_value: true
+    initial_value: "false"
+  - id: living_show_lights
+    type: bool
+    restore_value: true
+    initial_value: "false"
+  - id: kitchen_show_lights
+    type: bool
+    restore_value: true
+    initial_value: "false"
+
+  # global to pass to tiles for always getting a true value
+  - id: global_always_true
+    type: bool
+    initial_value: "true"
+
+  # light_colour globals
+
+  - id: light_colour_entity_id
+    type: std::string
+    max_restore_data_length: 254
+    initial_value: '"light.entry"' # pick on any one, will be overwritten by the button that is clicked
+
+  - id: light_colour_entity_name
+    type: std::string
+    max_restore_data_length: 12
+    initial_value: '"Entry"' # pick on any one, will be overwritten by the button that is clicked
+  - id: light_colour_red_value
+    type: int
+    initial_value: "0"
+  - id: light_colour_green_value
+    type: int
+    initial_value: "0"
+  - id: light_colour_blue_value
+    type: int
+    initial_value: "0"

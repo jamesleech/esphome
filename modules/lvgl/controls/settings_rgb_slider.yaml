@@ -1,0 +1,45 @@
+---
+# Button properties for a Light Toggle
+# vars:
+#   uid: <unique identifier for the tile>, used to set the global variables
+#   text:
+#   color: 0xFF0000 # Default color, can be overridden
+
+id: settings_slider_${uid}
+height: 30
+width: 100%
+layout:
+  type: flex
+  flex_flow: ROW
+widgets:
+  - obj:
+      height: 100%
+      width: 30%
+      layout:
+        type: flex
+        flex_flow: ROW
+      widgets:
+        - led:
+            color: ${color}
+            brightness: 100%
+        - label:
+            text: ${text}
+  - slider:
+      id: light_colour_slider_${uid}
+      width: 60%
+      min_value: 0
+      max_value: 256
+      value: !lambda "return id(light_colour_${uid}_value);" # todo: setting should be read from the light entity
+      height: 30
+      align: center
+      on_value:
+        - lambda: |-
+            id(light_colour_${uid}_value) = int(x);
+            ESP_LOGD("light_colour", "Value changed to %i", int(id(light_colour_${uid}_value)));
+        - homeassistant.action:
+            action: script.esphome_rgb_light_set
+            data:
+              entity_id: !lambda "return id(light_colour_entity_id);" # TODO: var or global
+              red: !lambda "return id(light_colour_red_value);"
+              green: !lambda "return id(light_colour_green_value);"
+              blue: !lambda "return id(light_colour_blue_value);"
