@@ -14,7 +14,7 @@ esp32:
       CONFIG_SPIRAM_FETCH_INSTRUCTIONS: y
       CONFIG_SPIRAM_RODATA: y
 
-captive_portal: 
+captive_portal:
 
 psram:
   mode: octal
@@ -32,6 +32,15 @@ light:
     name: ${device_name} Display Backlight
     id: display_backlight
     restore_mode: ALWAYS_ON
+    on_turn_on:
+      - logger.log: "Display backlight turned on"
+      # perhaps the light was turned on remotely, we now want to resume lvgl if it was paused
+      - if:
+          condition: lvgl.is_paused
+          then:
+            - logger.log: "LVGL resuming"
+            - lvgl.resume:
+            - lvgl.widget.redraw:
 
 i2c:
   sda: GPIO19
@@ -74,7 +83,7 @@ display:
         - 46 #b3
         - 9 #b4
         - 1 #b5
-  
+
 touchscreen:
   platform: gt911
   # transform:
