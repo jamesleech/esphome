@@ -13,6 +13,7 @@ esp32:
       CONFIG_ESP32S3_DATA_CACHE_64KB: y
       CONFIG_SPIRAM_FETCH_INSTRUCTIONS: y
       CONFIG_SPIRAM_RODATA: y
+  variant: esp32s3
 
 captive_portal:
 
@@ -20,6 +21,7 @@ psram:
   mode: octal
   speed: 80MHz
 
+# Define a PWM output on the ESP32 for the display backlight
 output:
   - platform: ledc
     pin: 2
@@ -57,35 +59,44 @@ display:
     dimensions:
       width: 800
       height: 480
-    de_pin: 40
+    de_pin: 41
     hsync_pin: 39
-    vsync_pin: 41
+    vsync_pin: 40
     pclk_pin: 0
-    pclk_frequency: 12MHz
-    # rotation: 180
+    pclk_frequency: 18MHz
+    hsync_pulse_width: 48
+    hsync_front_porch: 40
+    hsync_back_porch: 40
+    vsync_pulse_width: 31
+    vsync_front_porch: 1
+    vsync_back_porch: 13
     data_pins:
       red:
-        - 45 #r1
-        - 48 #r2
+        - 14 #r1
+        - 21 #r2
         - 47 #r3
-        - 21 #r4
-        - 14 #r5
+        - 48 #r4
+        - 45 #r5
       green:
-        - 5 #g0
-        - 6 #g1
-        - 7 #g2
-        - 15 #g3
+        - 9 #g0
+        - 46 #g1
+        - 3 #g2
+        - 8 #g3
         - 16 #g4
-        - 4 #g5
+        - 1 #g5
       blue:
-        - 8 #b1
-        - 3 #b2
-        - 46 #b3
-        - 9 #b4
-        - 1 #b5
+        - 15 #b1
+        - 7 #b2
+        - 6 #b3
+        - 5 #b4
+        - 4 #b5
 
 touchscreen:
   platform: gt911
+  id: touch0
+  display: main_display
+  #interrupt_pin: 19
+  update_interval: 50ms
   # rotate the screen
   # transform:
   #   mirror_x: true
